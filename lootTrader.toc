@@ -1,0 +1,6 @@
+## Interface: 11305
+## Title: lootTrader
+## Author: Zoh
+
+MainFrame.xml
+lootTrader.lua
