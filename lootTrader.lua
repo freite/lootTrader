@@ -43,6 +43,15 @@ function SK:ItemList_Update(sort)
 end
 
 function SK:ItemList_Reload()
+    local assignedItems = {}
+
+    -- saved assigned items
+    for _,item in pairs(SK.items) do
+        if item.assignedName and not item.pickedUp then
+            table.insert(assignedItems, { itemId = item.itemId, assignedName = item.assignedName )
+        end
+    end
+
     table.wipe(SK.items)
 
     SK.selectedItem = nil
@@ -65,6 +74,16 @@ function SK:ItemList_Reload()
                         table.insert(SK.items, { itemId = itemId, link = link, icon = icon, time = time, itemName = itemName })
                     end
                 end
+            end
+        end
+    end
+
+    -- attempt to reassign items
+    for _,assign in pairs(assignedItems) do
+        for _,item in pairs(SK.items) do
+            if item.itemId == assign.itemId and not item.assignedName then
+                item.assignedName = assign.assignedName
+                break
             end
         end
     end
@@ -180,8 +199,10 @@ function SK:TRADE_ACCEPT_UPDATE()
 
     for i=1,6 do
         local link = GetTradePlayerItemLink(i)
-        local itemId = link and GetItemInfoInstant(link)
-        table.insert(SK.tradingItems, itemId)
+        if link then
+            local itemId = GetItemInfoInstant(link)
+            table.insert(SK.tradingItems, itemId)
+        end
     end
 end
 
@@ -329,7 +350,7 @@ end
 
 function SK:Reload_Click(self)
     StaticPopupDialogs["LOOTTRADER_RELOAD_CONFIRM"] = {
-        text = "Reload items? All assigned items will be cleared!",
+        text = "Reload items?",
         button1 = "Yes",
         button2 = "No",
         OnAccept = function()
