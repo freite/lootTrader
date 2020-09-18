@@ -1,6 +1,8 @@
 --[[ Init ]]--
 
 LootTraderAddon = CreateFrame("Frame")
+local LibDataBroker = LibStub("LibDataBroker-1.1");
+local LibDBIcon = LibStub("LibDBIcon-1.0")
 local SK = LootTraderAddon
 SK:SetScript('OnEvent', function(self, event, ...) SK[event](self, ...); end)
 SK:RegisterEvent("PLAYER_LOGIN")
@@ -95,6 +97,7 @@ function SK:PLAYER_LOGIN()
     SK.items = {}
     SK.tradeCanceled = {}
     SK.debug = false
+    LootTraderAddonSavedVariables = LootTraderAddonSavedVariables or {}
 
     SK.mainFrame = CreateFrame("Frame", "LootTraderMainFrame", UIParent, "MainFrameTemplate")
     SK.dropMenuFrame = CreateFrame("Frame", "LootTraderDropMenuHelper", UIParent, "UIDropDownMenuTemplate")
@@ -108,6 +111,23 @@ function SK:PLAYER_LOGIN()
         SK.scanTooltip.right[i]:SetFontObject(GameFontNormal)
         SK.scanTooltip:AddFontStrings(SK.scanTooltip.left[i], SK.scanTooltip.right[i])
     end
+
+    local miniButton = LibDataBroker:NewDataObject("LootTraderAddon", {
+        type = "launcher",
+        icon = "Interface\\Icons\\INV_Misc_Bag_10_Blue",
+        OnClick = function(self, event)
+            if SK.mainFrame:IsShown() then
+                SK.mainFrame:Hide()
+            else
+                SK.mainFrame:Show()
+            end
+        end,
+        OnTooltipShow = function(tooltip)
+            tooltip:AddLine("LootTrader")
+        end
+    });
+
+    LibDBIcon:Register("LootTrader", miniButton, LootTraderAddonSavedVariables);
 
     SK:RegisterEvent("TRADE_SHOW")
     SK:RegisterEvent("TRADE_ACCEPT_UPDATE")

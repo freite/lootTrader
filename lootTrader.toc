@@ -1,6 +1,12 @@
 ## Interface: 11305
 ## Title: lootTrader
 ## Author: Zoh
+## SavedVariables: LootTraderAddonSavedVariables
+
+Libs\LibStub\LibStub.lua
+Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
+Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
+Libs\LibDBIcon-1.0\LibDBIcon-1.0.lua
 
 MainFrame.xml
 lootTrader.lua
