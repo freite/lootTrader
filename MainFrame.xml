@@ -1,326 +1,326 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
-	<Button name="ColumnButtonTemplate" virtual="true">
-		<Size>
-			<AbsDimension x="10" y="24" />
-		</Size>
-		<Layers>
-			<Layer level="BACKGROUND">
-				<Texture name="$parentLeft" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
-					<Size>
-						<AbsDimension x="5" y="24" />
-					</Size>
-					<Anchors>
-						<Anchor point="TOPLEFT" />
-					</Anchors>
-					<TexCoords left="0" right="0.078125" top="0" bottom="0.75" />
-				</Texture>
-				<Texture name="$parentMiddle" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
-					<Size>
-						<AbsDimension x="53" y="24" />
-					</Size>
-					<Anchors>
-						<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT" />
-					</Anchors>
-					<TexCoords left="0.078125" right="0.90625" top="0" bottom="0.75" />
-				</Texture>
-				<Texture name="$parentRight" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
-					<Size>
-						<AbsDimension x="4" y="24" />
-					</Size>
-					<Anchors>
-						<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT" />
-					</Anchors>
-					<TexCoords left="0.90625" right="0.96875" top="0" bottom="0.75" />
-				</Texture>
-			</Layer>
-		</Layers>
-		<Scripts>
-			<OnLoad>WhoFrameColumn_SetWidth(self, self:GetWidth())</OnLoad>
-		</Scripts>
-		<ButtonText>
-			<Anchors>
-				<Anchor point="LEFT">
-					<Offset>
-						<AbsDimension x="8" y="0" />
-					</Offset>
-				</Anchor>
-			</Anchors>
-		</ButtonText>
-		<NormalFont style="GameFontHighlightSmall" />
-		<HighlightTexture name="$parentHighlightTexture" file="Interface\PaperDollInfoFrame\UI-Character-Tab-Highlight" alphaMode="ADD">
-			<Anchors>
-				<Anchor point="TOPLEFT" relativeTo="$parentLeft">
-					<Offset>
-						<AbsDimension x="-2" y="5" />
-					</Offset>
-				</Anchor>
-				<Anchor point="BOTTOMRIGHT" relativeTo="$parentRight">
-					<Offset>
-						<AbsDimension x="2" y="-7" />
-					</Offset>
-				</Anchor>
-			</Anchors>
-		</HighlightTexture>
-	</Button>
+    <Button name="ColumnButtonTemplate" virtual="true">
+        <Size>
+            <AbsDimension x="10" y="24" />
+        </Size>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture name="$parentLeft" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+                    <Size>
+                        <AbsDimension x="5" y="24" />
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" />
+                    </Anchors>
+                    <TexCoords left="0" right="0.078125" top="0" bottom="0.75" />
+                </Texture>
+                <Texture name="$parentMiddle" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+                    <Size>
+                        <AbsDimension x="53" y="24" />
+                    </Size>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT" />
+                    </Anchors>
+                    <TexCoords left="0.078125" right="0.90625" top="0" bottom="0.75" />
+                </Texture>
+                <Texture name="$parentRight" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
+                    <Size>
+                        <AbsDimension x="4" y="24" />
+                    </Size>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT" />
+                    </Anchors>
+                    <TexCoords left="0.90625" right="0.96875" top="0" bottom="0.75" />
+                </Texture>
+            </Layer>
+        </Layers>
+        <Scripts>
+            <OnLoad>WhoFrameColumn_SetWidth(self, self:GetWidth())</OnLoad>
+        </Scripts>
+        <ButtonText>
+            <Anchors>
+                <Anchor point="LEFT">
+                    <Offset>
+                        <AbsDimension x="8" y="0" />
+                    </Offset>
+                </Anchor>
+            </Anchors>
+        </ButtonText>
+        <NormalFont style="GameFontHighlightSmall" />
+        <HighlightTexture name="$parentHighlightTexture" file="Interface\PaperDollInfoFrame\UI-Character-Tab-Highlight" alphaMode="ADD">
+            <Anchors>
+                <Anchor point="TOPLEFT" relativeTo="$parentLeft">
+                    <Offset>
+                        <AbsDimension x="-2" y="5" />
+                    </Offset>
+                </Anchor>
+                <Anchor point="BOTTOMRIGHT" relativeTo="$parentRight">
+                    <Offset>
+                        <AbsDimension x="2" y="-7" />
+                    </Offset>
+                </Anchor>
+            </Anchors>
+        </HighlightTexture>
+    </Button>
 
-	<CheckButton name="ListEntryTemplate" hidden="true" parentArray="entries" virtual="true">
-		<Size>
-			<AbsDimension x="100" y="16" />
-		</Size>
-		<NormalFont style="GameFontHighlightLeft" />
-		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD" />
-		<CheckedTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD" />
-		<Texture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD" />
-		<Layers>
-			<Layer level="BACKGROUND">
-				<FontString parentKey="Col1" inherits="GameFontHighlightSmall" text="Col1" justifyH="LEFT">
-					<Anchors>
-						<Anchor point="LEFT" x="10" y="0" />
-					</Anchors>
-				</FontString>
-				<FontString parentKey="Col2" inherits="GameFontHighlightSmall" text="Col2" justifyH="LEFT">
-					<Anchors>
-						<Anchor point="LEFT" x="260" y="0" />
-					</Anchors>
-				</FontString>
-				<FontString parentKey="Col3" inherits="GameFontHighlightSmall" text="Col3" justifyH="RIGHT">
-					<Anchors>
-						<Anchor point="RIGHT" x="-2" y="0" />
-					</Anchors>
-				</FontString>
-			</Layer>
-		</Layers>
-		<Scripts>
+    <CheckButton name="ListEntryTemplate" hidden="true" parentArray="entries" virtual="true">
+        <Size>
+            <AbsDimension x="100" y="16" />
+        </Size>
+        <NormalFont style="GameFontHighlightLeft" />
+        <HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD" />
+        <CheckedTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD" />
+        <Texture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD" />
+        <Layers>
+            <Layer level="BACKGROUND">
+                <FontString parentKey="Col1" inherits="GameFontHighlightSmall" text="Col1" justifyH="LEFT">
+                    <Anchors>
+                        <Anchor point="LEFT" x="10" y="0" />
+                    </Anchors>
+                </FontString>
+                <FontString parentKey="Col2" inherits="GameFontHighlightSmall" text="Col2" justifyH="LEFT">
+                    <Anchors>
+                        <Anchor point="LEFT" x="260" y="0" />
+                    </Anchors>
+                </FontString>
+                <FontString parentKey="Col3" inherits="GameFontHighlightSmall" text="Col3" justifyH="RIGHT">
+                    <Anchors>
+                        <Anchor point="RIGHT" x="-2" y="0" />
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Scripts>
             <OnClick>LootTraderAddon:Item_Click(self)</OnClick>
-			<OnEnter>
-				GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 30, 16)
-				GameTooltip:SetHyperlink(self.item.link)
-				GameTooltip:Show()
-			</OnEnter>
-			<OnLeave>
-				GameTooltip:Hide()
-			</OnLeave>
-		</Scripts>
-	</CheckButton>
+            <OnEnter>
+                GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 30, 16)
+                GameTooltip:SetHyperlink(self.item.link)
+                GameTooltip:Show()
+            </OnEnter>
+            <OnLeave>
+                GameTooltip:Hide()
+            </OnLeave>
+        </Scripts>
+    </CheckButton>
 
 <!-- Main Frame -->
-	<Frame name="MainFrameTemplate" inherits="PortraitFrameTemplate" virtual="true" hidden="true" enableMouse="true" movable="true" clampedToScreen="false" frameStrata="DIALOG">
-		<Anchors>
-			<Anchor point="CENTER" />
-		</Anchors>
+    <Frame name="MainFrameTemplate" inherits="PortraitFrameTemplate" virtual="true" hidden="true" enableMouse="true" movable="true" clampedToScreen="false" frameStrata="DIALOG">
+        <Anchors>
+            <Anchor point="CENTER" />
+        </Anchors>
 
-		<Layers>
-			<Layer level="ARTWORK">
-				<FontString inherits="GameFontNormalLarge" parentKey="ItemLink">
-					<Anchors>
-						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="70" y="-36" />
-					</Anchors>
-				</FontString>
-			</Layer>
-		</Layers>
+        <Layers>
+            <Layer level="ARTWORK">
+                <FontString inherits="GameFontNormalLarge" parentKey="ItemLink">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="70" y="-36" />
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
 
-		<Size>
-			<AbsDimension x="500" y="380" />
-		</Size>
+        <Size>
+            <AbsDimension x="500" y="380" />
+        </Size>
 
-		<Scripts>
-			<OnLoad>self.portrait:SetTexture("Interface\\QuestFrame\\UI-QuestLog-BookIcon")</OnLoad>
-			<OnMouseDown>self:StartMoving()</OnMouseDown>
-			<OnMouseUp>self:StopMovingOrSizing()</OnMouseUp>
-			<OnShow>LootTraderAddon:Show()</OnShow>
-		</Scripts>
+        <Scripts>
+            <OnLoad>self.portrait:SetTexture("Interface\\QuestFrame\\UI-QuestLog-BookIcon")</OnLoad>
+            <OnMouseDown>self:StartMoving()</OnMouseDown>
+            <OnMouseUp>self:StopMovingOrSizing()</OnMouseUp>
+            <OnShow>LootTraderAddon:Show()</OnShow>
+        </Scripts>
 
-		<Frames>
-			<Frame name="$parentInset" useParentLevel="true" inherits="InsetFrameTemplate" parentKey="Inset">
-				<Anchors>
-					<Anchor point="TOPLEFT" x="4" y="-90" />
-					<Anchor point="BOTTOMRIGHT" x="-6" y="40" />
-				</Anchors>
-			</Frame>
+        <Frames>
+            <Frame name="$parentInset" useParentLevel="true" inherits="InsetFrameTemplate" parentKey="Inset">
+                <Anchors>
+                    <Anchor point="TOPLEFT" x="4" y="-90" />
+                    <Anchor point="BOTTOMRIGHT" x="-6" y="40" />
+                </Anchors>
+            </Frame>
 
-			<Button name="$parentColumn3" parentKey="column3" inherits="ColumnButtonTemplate" text="Time">
-				<Anchors>
-					<Anchor point="BOTTOMRIGHT" relativeTo="$parentInset" relativePoint="TOPRIGHT" x="-3" y="-1" />
-				</Anchors>
-				<Size>
-					<AbsDimension x="65" y="24" />
-				</Size>
-				<Scripts>
-					<OnClick>LootTraderAddon:SortColumn_Click("time")</OnClick>
-				</Scripts>
-			</Button>
-			<Button name="$parentColumn2" parentKey="column2" inherits="ColumnButtonTemplate" text="Player">
-				<Anchors>
-					<Anchor point="BOTTOMRIGHT" relativeTo="$parentColumn3" relativePoint="BOTTOMLEFT" x="2" y="0" />
-				</Anchors>
-				<Size>
-					<AbsDimension x="170" y="24" />
-				</Size>
-				<Scripts>
-					<OnLoad>WhoFrameColumn_SetWidth(self, self:GetWidth()); self:Disable()</OnLoad>
-				</Scripts>
-			</Button>
-			<Button name="$parentColumn1" parentKey="column1" inherits="ColumnButtonTemplate" text="Item">
-				<Anchors>
-					<Anchor point="BOTTOMRIGHT" relativeTo="$parentColumn2" relativePoint="BOTTOMLEFT" x="2" y="0" />
-					<Anchor point="BOTTOMLEFT" relativeTo="$parentInset" relativePoint="TOPLEFT" x="2" y="-1" />
-				</Anchors>
-				<Scripts>
-					<OnClick>LootTraderAddon:SortColumn_Click("item")</OnClick>
-				</Scripts>
-			</Button>
+            <Button name="$parentColumn3" parentKey="column3" inherits="ColumnButtonTemplate" text="Time">
+                <Anchors>
+                    <Anchor point="BOTTOMRIGHT" relativeTo="$parentInset" relativePoint="TOPRIGHT" x="-3" y="-1" />
+                </Anchors>
+                <Size>
+                    <AbsDimension x="65" y="24" />
+                </Size>
+                <Scripts>
+                    <OnClick>LootTraderAddon:SortColumn_Click("time")</OnClick>
+                </Scripts>
+            </Button>
+            <Button name="$parentColumn2" parentKey="column2" inherits="ColumnButtonTemplate" text="Player">
+                <Anchors>
+                    <Anchor point="BOTTOMRIGHT" relativeTo="$parentColumn3" relativePoint="BOTTOMLEFT" x="2" y="0" />
+                </Anchors>
+                <Size>
+                    <AbsDimension x="170" y="24" />
+                </Size>
+                <Scripts>
+                    <OnLoad>WhoFrameColumn_SetWidth(self, self:GetWidth()); self:Disable()</OnLoad>
+                </Scripts>
+            </Button>
+            <Button name="$parentColumn1" parentKey="column1" inherits="ColumnButtonTemplate" text="Item">
+                <Anchors>
+                    <Anchor point="BOTTOMRIGHT" relativeTo="$parentColumn2" relativePoint="BOTTOMLEFT" x="2" y="0" />
+                    <Anchor point="BOTTOMLEFT" relativeTo="$parentInset" relativePoint="TOPLEFT" x="2" y="-1" />
+                </Anchors>
+                <Scripts>
+                    <OnClick>LootTraderAddon:SortColumn_Click("item")</OnClick>
+                </Scripts>
+            </Button>
 
-			<ScrollFrame name="$parentItemList" parentKey="itemList" inherits="FauxScrollFrameTemplate">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="$parentInset" relativePoint="TOPLEFT" x="0" y="-3" />
-					<Anchor point="BOTTOMRIGHT" relativeTo="$parentInset" relativePoint="BOTTOMRIGHT" x="-25" y="1" />
-				</Anchors>
-				<Scripts>
-					<OnVerticalScroll>
-						FauxScrollFrame_OnVerticalScroll(self, offset, 16, LootTraderAddon.ItemList_Update)
-						GameTooltip:Hide()
-					</OnVerticalScroll>
-				</Scripts>
-			</ScrollFrame>
+            <ScrollFrame name="$parentItemList" parentKey="itemList" inherits="FauxScrollFrameTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentInset" relativePoint="TOPLEFT" x="0" y="-3" />
+                    <Anchor point="BOTTOMRIGHT" relativeTo="$parentInset" relativePoint="BOTTOMRIGHT" x="-25" y="1" />
+                </Anchors>
+                <Scripts>
+                    <OnVerticalScroll>
+                        FauxScrollFrame_OnVerticalScroll(self, offset, 16, LootTraderAddon.ItemList_Update)
+                        GameTooltip:Hide()
+                    </OnVerticalScroll>
+                </Scripts>
+            </ScrollFrame>
 
 <!-- List entries -->
-			<CheckButton name="$parentScrollEntry1" inherits="ListEntryTemplate">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="$parentItemList" x="2" y="-2" />
-					<Anchor point="TOPRIGHT" relativeTo="$parentItemList" x="2" y="-2" />
-				</Anchors>
-			</CheckButton>
-			<CheckButton name="$parentScrollEntry2" inherits="ListEntryTemplate">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="$parentScrollEntry1" relativePoint="BOTTOMLEFT" />
-					<Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry1" relativePoint="BOTTOMRIGHT" />
-				</Anchors>
-			</CheckButton>
-			<CheckButton name="$parentScrollEntry3" inherits="ListEntryTemplate">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="$parentScrollEntry2" relativePoint="BOTTOMLEFT" />
-					<Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry2" relativePoint="BOTTOMRIGHT" />
-				</Anchors>
-			</CheckButton>
-			<CheckButton name="$parentScrollEntry4" inherits="ListEntryTemplate">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="$parentScrollEntry3" relativePoint="BOTTOMLEFT" />
-					<Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry3" relativePoint="BOTTOMRIGHT" />
-				</Anchors>
-			</CheckButton>
-			<CheckButton name="$parentScrollEntry5" inherits="ListEntryTemplate">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="$parentScrollEntry4" relativePoint="BOTTOMLEFT" />
-					<Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry4" relativePoint="BOTTOMRIGHT" />
-				</Anchors>
-			</CheckButton>
-			<CheckButton name="$parentScrollEntry6" inherits="ListEntryTemplate">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="$parentScrollEntry5" relativePoint="BOTTOMLEFT" />
-					<Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry5" relativePoint="BOTTOMRIGHT" />
-				</Anchors>
-			</CheckButton>
-			<CheckButton name="$parentScrollEntry7" inherits="ListEntryTemplate">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="$parentScrollEntry6" relativePoint="BOTTOMLEFT" />
-					<Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry6" relativePoint="BOTTOMRIGHT" />
-				</Anchors>
-			</CheckButton>
-			<CheckButton name="$parentScrollEntry8" inherits="ListEntryTemplate">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="$parentScrollEntry7" relativePoint="BOTTOMLEFT" />
-					<Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry7" relativePoint="BOTTOMRIGHT" />
-				</Anchors>
-			</CheckButton>
-			<CheckButton name="$parentScrollEntry9" inherits="ListEntryTemplate">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="$parentScrollEntry8" relativePoint="BOTTOMLEFT" />
-					<Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry8" relativePoint="BOTTOMRIGHT" />
-				</Anchors>
-			</CheckButton>
-			<CheckButton name="$parentScrollEntry10" inherits="ListEntryTemplate">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="$parentScrollEntry9" relativePoint="BOTTOMLEFT" />
-					<Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry9" relativePoint="BOTTOMRIGHT" />
-				</Anchors>
-			</CheckButton>
-			<CheckButton name="$parentScrollEntry11" inherits="ListEntryTemplate">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="$parentScrollEntry10" relativePoint="BOTTOMLEFT" />
-					<Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry10" relativePoint="BOTTOMRIGHT" />
-				</Anchors>
-			</CheckButton>
-			<CheckButton name="$parentScrollEntry12" inherits="ListEntryTemplate">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="$parentScrollEntry11" relativePoint="BOTTOMLEFT" />
-					<Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry11" relativePoint="BOTTOMRIGHT" />
-				</Anchors>
-			</CheckButton>
-			<CheckButton name="$parentScrollEntry13" inherits="ListEntryTemplate">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="$parentScrollEntry12" relativePoint="BOTTOMLEFT" />
-					<Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry12" relativePoint="BOTTOMRIGHT" />
-				</Anchors>
-			</CheckButton>
-			<CheckButton name="$parentScrollEntry14" inherits="ListEntryTemplate">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="$parentScrollEntry13" relativePoint="BOTTOMLEFT" />
-					<Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry13" relativePoint="BOTTOMRIGHT" />
-				</Anchors>
-			</CheckButton>
-			<CheckButton name="$parentScrollEntry15" inherits="ListEntryTemplate">
-				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="$parentScrollEntry14" relativePoint="BOTTOMLEFT" />
-					<Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry14" relativePoint="BOTTOMRIGHT" />
-				</Anchors>
-			</CheckButton>
+            <CheckButton name="$parentScrollEntry1" inherits="ListEntryTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentItemList" x="2" y="-2" />
+                    <Anchor point="TOPRIGHT" relativeTo="$parentItemList" x="2" y="-2" />
+                </Anchors>
+            </CheckButton>
+            <CheckButton name="$parentScrollEntry2" inherits="ListEntryTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentScrollEntry1" relativePoint="BOTTOMLEFT" />
+                    <Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry1" relativePoint="BOTTOMRIGHT" />
+                </Anchors>
+            </CheckButton>
+            <CheckButton name="$parentScrollEntry3" inherits="ListEntryTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentScrollEntry2" relativePoint="BOTTOMLEFT" />
+                    <Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry2" relativePoint="BOTTOMRIGHT" />
+                </Anchors>
+            </CheckButton>
+            <CheckButton name="$parentScrollEntry4" inherits="ListEntryTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentScrollEntry3" relativePoint="BOTTOMLEFT" />
+                    <Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry3" relativePoint="BOTTOMRIGHT" />
+                </Anchors>
+            </CheckButton>
+            <CheckButton name="$parentScrollEntry5" inherits="ListEntryTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentScrollEntry4" relativePoint="BOTTOMLEFT" />
+                    <Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry4" relativePoint="BOTTOMRIGHT" />
+                </Anchors>
+            </CheckButton>
+            <CheckButton name="$parentScrollEntry6" inherits="ListEntryTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentScrollEntry5" relativePoint="BOTTOMLEFT" />
+                    <Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry5" relativePoint="BOTTOMRIGHT" />
+                </Anchors>
+            </CheckButton>
+            <CheckButton name="$parentScrollEntry7" inherits="ListEntryTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentScrollEntry6" relativePoint="BOTTOMLEFT" />
+                    <Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry6" relativePoint="BOTTOMRIGHT" />
+                </Anchors>
+            </CheckButton>
+            <CheckButton name="$parentScrollEntry8" inherits="ListEntryTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentScrollEntry7" relativePoint="BOTTOMLEFT" />
+                    <Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry7" relativePoint="BOTTOMRIGHT" />
+                </Anchors>
+            </CheckButton>
+            <CheckButton name="$parentScrollEntry9" inherits="ListEntryTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentScrollEntry8" relativePoint="BOTTOMLEFT" />
+                    <Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry8" relativePoint="BOTTOMRIGHT" />
+                </Anchors>
+            </CheckButton>
+            <CheckButton name="$parentScrollEntry10" inherits="ListEntryTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentScrollEntry9" relativePoint="BOTTOMLEFT" />
+                    <Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry9" relativePoint="BOTTOMRIGHT" />
+                </Anchors>
+            </CheckButton>
+            <CheckButton name="$parentScrollEntry11" inherits="ListEntryTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentScrollEntry10" relativePoint="BOTTOMLEFT" />
+                    <Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry10" relativePoint="BOTTOMRIGHT" />
+                </Anchors>
+            </CheckButton>
+            <CheckButton name="$parentScrollEntry12" inherits="ListEntryTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentScrollEntry11" relativePoint="BOTTOMLEFT" />
+                    <Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry11" relativePoint="BOTTOMRIGHT" />
+                </Anchors>
+            </CheckButton>
+            <CheckButton name="$parentScrollEntry13" inherits="ListEntryTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentScrollEntry12" relativePoint="BOTTOMLEFT" />
+                    <Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry12" relativePoint="BOTTOMRIGHT" />
+                </Anchors>
+            </CheckButton>
+            <CheckButton name="$parentScrollEntry14" inherits="ListEntryTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentScrollEntry13" relativePoint="BOTTOMLEFT" />
+                    <Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry13" relativePoint="BOTTOMRIGHT" />
+                </Anchors>
+            </CheckButton>
+            <CheckButton name="$parentScrollEntry15" inherits="ListEntryTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentScrollEntry14" relativePoint="BOTTOMLEFT" />
+                    <Anchor point="TOPRIGHT" relativeTo="$parentScrollEntry14" relativePoint="BOTTOMRIGHT" />
+                </Anchors>
+            </CheckButton>
 <!-- Buttons -->
-			<Button name="$parentAnnounceAllButton" inherits="UIPanelButtonTemplate" text="Announce all items">
-				<Size>
-					<AbsDimension x="150" y="24" />
-				</Size>
-				<Anchors>
-					<Anchor point="BOTTOMLEFT" x="10" y="10" />
-				</Anchors>
-				<Scripts>
-					<OnClick>LootTraderAddon:AnnounceAll_Click()</OnClick>
-				</Scripts>
-			</Button>
-			<Button name="$parentAnnounceOneButton" inherits="UIPanelButtonTemplate" text="Announce item">
-				<Size>
-					<AbsDimension x="120" y="24" />
-				</Size>
-				<Anchors>
-					<Anchor point="BOTTOMRIGHT" x="-10" y="10" />
-				</Anchors>
-				<Scripts>
-					<OnClick>LootTraderAddon:AnnounceOne_Click()</OnClick>
-				</Scripts>
-			</Button>
-			<Button name="$parentAssignButton" inherits="UIPanelButtonTemplate" text="Assign item">
-				<Size>
-					<AbsDimension x="120" y="24" />
-				</Size>
-				<Anchors>
-					<Anchor point="BOTTOMRIGHT" relativeTo="$parentAnnounceOneButton" relativePoint="BOTTOMLEFT" x="-10" y="0" />
-				</Anchors>
-				<Scripts>
-					<OnClick>LootTraderAddon:AssignItem_Click(self)</OnClick>
-				</Scripts>
-			</Button>
-			<Button name="$parentReloadButton" inherits="UIPanelButtonTemplate" text="R">
-				<Size>
-					<AbsDimension x="32" y="32" />
-				</Size>
-				<Anchors>
-					<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" x="-10" y="-30" />
-				</Anchors>
-				<Scripts>
-					<OnClick>LootTraderAddon:Reload_Click(self)</OnClick>
-				</Scripts>
-			</Button>
+            <Button name="$parentAnnounceAllButton" inherits="UIPanelButtonTemplate" text="Announce all items">
+                <Size>
+                    <AbsDimension x="150" y="24" />
+                </Size>
+                <Anchors>
+                    <Anchor point="BOTTOMLEFT" x="10" y="10" />
+                </Anchors>
+                <Scripts>
+                    <OnClick>LootTraderAddon:AnnounceAll_Click()</OnClick>
+                </Scripts>
+            </Button>
+            <Button name="$parentAnnounceOneButton" inherits="UIPanelButtonTemplate" text="Announce item">
+                <Size>
+                    <AbsDimension x="120" y="24" />
+                </Size>
+                <Anchors>
+                    <Anchor point="BOTTOMRIGHT" x="-10" y="10" />
+                </Anchors>
+                <Scripts>
+                    <OnClick>LootTraderAddon:AnnounceOne_Click()</OnClick>
+                </Scripts>
+            </Button>
+            <Button name="$parentAssignButton" inherits="UIPanelButtonTemplate" text="Assign item">
+                <Size>
+                    <AbsDimension x="120" y="24" />
+                </Size>
+                <Anchors>
+                    <Anchor point="BOTTOMRIGHT" relativeTo="$parentAnnounceOneButton" relativePoint="BOTTOMLEFT" x="-10" y="0" />
+                </Anchors>
+                <Scripts>
+                    <OnClick>LootTraderAddon:AssignItem_Click(self)</OnClick>
+                </Scripts>
+            </Button>
+            <Button name="$parentReloadButton" inherits="UIPanelButtonTemplate" text="R">
+                <Size>
+                    <AbsDimension x="32" y="32" />
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" x="-10" y="-30" />
+                </Anchors>
+                <Scripts>
+                    <OnClick>LootTraderAddon:Reload_Click(self)</OnClick>
+                </Scripts>
+            </Button>
 
-		</Frames>
-	</Frame>
+        </Frames>
+    </Frame>
 </Ui>
