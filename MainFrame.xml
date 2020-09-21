@@ -128,7 +128,8 @@
             <OnLoad>self.portrait:SetTexture("Interface\\QuestFrame\\UI-QuestLog-BookIcon")</OnLoad>
             <OnMouseDown>self:StartMoving()</OnMouseDown>
             <OnMouseUp>self:StopMovingOrSizing()</OnMouseUp>
-            <OnShow>LootTraderAddon:Show()</OnShow>
+            <OnShow>LootTraderAddon:MainFrame_Show()</OnShow>
+            <OnHide>LootTraderAddon:MainFrame_Hide()</OnHide>
         </Scripts>
 
         <Frames>
@@ -158,7 +159,7 @@
                     <AbsDimension x="170" y="24" />
                 </Size>
                 <Scripts>
-                    <OnLoad>WhoFrameColumn_SetWidth(self, self:GetWidth()); self:Disable()</OnLoad>
+                    <OnClick>LootTraderAddon:SortColumn_Click("player")</OnClick>
                 </Scripts>
             </Button>
             <Button name="$parentColumn1" parentKey="column1" inherits="ColumnButtonTemplate" text="Item">
@@ -309,7 +310,7 @@
                     <OnClick>LootTraderAddon:AssignItem_Click(self)</OnClick>
                 </Scripts>
             </Button>
-            <Button name="$parentReloadButton" inherits="UIPanelButtonTemplate" text="R">
+            <Button name="$parentHistoryButton" inherits="UIPanelButtonTemplate" text=">">
                 <Size>
                     <AbsDimension x="32" y="32" />
                 </Size>
@@ -317,7 +318,7 @@
                     <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" x="-10" y="-30" />
                 </Anchors>
                 <Scripts>
-                    <OnClick>LootTraderAddon:Reload_Click(self)</OnClick>
+                    <OnClick>LootTraderAddon:History_Click(self)</OnClick>
                 </Scripts>
             </Button>
 

@@ -9,10 +9,6 @@ SK:RegisterEvent("PLAYER_LOGIN")
 
 --[[ Functions ]]--
 
-function SK:Show()
-    SK:ItemList_Update(true)
-end
-
 function SK:ItemList_Update(sort)
     if sort then
         SK:SortItems()
@@ -27,9 +23,7 @@ function SK:ItemList_Update(sort)
         else
             local item = SK.items[start+i]
             SK.mainFrame.entries[i].Col1:SetText(item.link)
-            if item.assignedName and item.pickedUp then
-                SK.mainFrame.entries[i].Col2:SetText("|cFF90EE90Traded to|r " .. RAID_CLASS_COLORS[item.assignedClass]:WrapTextInColorCode(item.assignedName))
-            elseif item.assignedName then
+            if item.assignedName then
                 SK.mainFrame.entries[i].Col2:SetText(RAID_CLASS_COLORS[item.assignedClass]:WrapTextInColorCode(item.assignedName))
             else
                 SK.mainFrame.entries[i].Col2:SetText("|cFFAAAAAAUnassigned|r")
@@ -43,20 +37,18 @@ function SK:ItemList_Update(sort)
 end
 
 function SK:ItemList_Reload()
-    local assignedItems = {}
+    local assignedItems, prevSelectedItem = {}, SK.selectedItem
 
     -- saved assigned items
     for _,item in pairs(SK.items) do
-        if item.assignedName and not item.pickedUp then
-            table.insert(assignedItems, { itemId = item.itemId, assignedName = item.assignedName )
+        if item.assignedName then
+            assignedItems[SK:invKey(item)] = item
         end
     end
 
     table.wipe(SK.items)
 
     SK.selectedItem = nil
-    SetPortraitToTexture(SK.mainFrame.portrait, "Interface\\QuestFrame\\UI-QuestLog-BookIcon")
-    SK.mainFrame.ItemLink:SetText(nil)
 
     for bag = 0, NUM_BAG_SLOTS do
         if GetContainerNumSlots(bag) then
@@ -71,40 +63,48 @@ function SK:ItemList_Reload()
                         local itemName = GetItemInfo(link)
                         local time = string.match(line, ".-(%d+) min") or 0
                         time = time + (string.match(line, ".-(%d+) hour") or 0)*60
-                        table.insert(SK.items, { itemId = itemId, link = link, icon = icon, time = time, itemName = itemName })
+
+                        local item = { itemId = itemId, link = link, icon = icon, time = time, itemName = itemName, bag = bag, slot = slot }
+
+                        if assignedItems[SK:invKey(item)] then
+                            item.assignedName = assignedItems[SK:invKey(item)].assignedName
+                            item.assignedClass = assignedItems[SK:invKey(item)].assignedClass
+                        end
+
+                        if prevSelectedItem and prevSelectedItem.slot == slot and prevSelectedItem.bag == bag then
+                            SK.selectedItem = item
+                        end
+
+                        table.insert(SK.items, item)
                     end
                 end
             end
         end
     end
 
-    -- attempt to reassign items
-    for _,assign in pairs(assignedItems) do
-        for _,item in pairs(SK.items) do
-            if item.itemId == assign.itemId and not item.assignedName then
-                item.assignedName = assign.assignedName
-                break
-            end
-        end
+    if SK.selectedItem then
+        SetPortraitToTexture(SK.mainFrame.portrait, SK.selectedItem.icon)
+        SK.mainFrame.ItemLink:SetText(SK.selectedItem.link)
+    else
+        SetPortraitToTexture(SK.mainFrame.portrait, "Interface\\QuestFrame\\UI-QuestLog-BookIcon")
+        SK.mainFrame.ItemLink:SetText(nil)
     end
 end
 
 function SK:SortItems()
     if SK.sortBy == "item" and SK.sortReverse then
-        table.sort(SK.items, function(i1,i2) return i1.itemName > i2.itemName; end)
+        table.sort(SK.items, function(i1,i2) return format("%s%02u%02u", i1.itemName, i1.slot, i1.bag) > format("%s%02u%02u", i2.itemName, i2.slot, i2.bag); end)
     elseif SK.sortBy == "item" and not SK.sortReverse then
-        table.sort(SK.items, function(i1,i2) return i1.itemName < i2.itemName; end)
-    elseif SK.sortReverse then -- default to time
-        table.sort(SK.items, function(i1,i2) return i1.time > i2.time; end)
-    else -- default to time
-        table.sort(SK.items, function(i1,i2) return i1.time < i2.time; end)
-    end
---[[
+        table.sort(SK.items, function(i1,i2) return format("%s%02u%02u", i1.itemName, i1.slot, i1.bag) < format("%s%02u%02u", i2.itemName, i2.slot, i2.bag); end)
     elseif SK.sortBy == "player" and SK.sortReverse then
-        table.sort(SK.items, function(i1,i2) return (i1.assignedName or "") > (i2.assignedName or ""); end)
+        table.sort(SK.items, function(i1,i2) return format("%s%02u%02u", i1.assignedName or "", i1.slot, i1.bag) > format("%s%02u%02u", i2.assignedName or "", i2.slot, i2.bag); end)
     elseif SK.sortBy == "player" and not SK.sortReverse then
-        table.sort(SK.items, function(i1,i2) return (i1.assignedName or "") < (i2.assignedName or ""); end)
-]]--
+        table.sort(SK.items, function(i1,i2) return format("%s%02u%02u", i1.assignedName or "", i1.slot, i1.bag) < format("%s%02u%02u", i2.assignedName or "", i2.slot, i2.bag); end)
+    elseif SK.sortReverse then -- default to time
+        table.sort(SK.items, function(i1,i2) return format("%03u%02u%02u", i1.time, i1.slot, i1.bag) > format("%03u%02u%02u", i2.time, i2.slot, i2.bag); end)
+    else -- default to time
+        table.sort(SK.items, function(i1,i2) return format("%03u%02u%02u", i1.time, i1.slot, i1.bag) < format("%03u%02u%02u", i2.time, i2.slot, i2.bag); end)
+    end
 end
 
 --[[ Events ]]--
@@ -114,8 +114,9 @@ function SK:PLAYER_LOGIN()
     SK.sortReverse = false
     SK.visibleLines = 15 -- number of scroll items in XML
     SK.items = {}
+    SK.itemHistory = {}
     SK.tradeCanceled = {}
-    SK.debug = false
+    SK.debug = true
     LootTraderAddonSavedVariables = LootTraderAddonSavedVariables or {}
 
     SK.mainFrame = CreateFrame("Frame", "LootTraderMainFrame", UIParent, "MainFrameTemplate")
@@ -144,7 +145,7 @@ function SK:PLAYER_LOGIN()
         OnTooltipShow = function(tooltip)
             tooltip:AddLine("LootTrader")
         end
-    });
+    })
 
     LibDBIcon:Register("LootTrader", miniButton, LootTraderAddonSavedVariables);
 
@@ -169,23 +170,25 @@ function SK:TRADE_SHOW()
     SK.tradingItems = {} -- dont wipe
     SK.tradeCanceled[SK.tradingPlayer] = nil
 
-    local slotsAvail = 6
+    local slotIndex = 1
 
     -- clear trading flag
     for _,item in pairs(SK.items) do item.trading = false;	end
 
     for bag = 0, NUM_BAG_SLOTS do
         if GetContainerNumSlots(bag) then
-            for slot = 0, GetContainerNumSlots(bag) do
+            for slot = 1, GetContainerNumSlots(bag) do
                 local _, _, _, _, _, _, link, _, _, itemId = GetContainerItemInfo(bag, slot)
 
                 for _,item in pairs(SK.items) do
-                    if item.itemId == itemId and item.trading == false and item.assignedName == SK.tradingPlayer and slotsAvail > 0 then
+                    if item.itemId == itemId and item.trading == false and item.assignedName == SK.tradingPlayer and slotIndex < 7 then
                         SK:ScanToolTipSetBagItem(bag, slot)
                         if SK:ScanToolTipFindLine("You may trade this item with players that were also eligible", true, false) then
-                            item.trading = true
-                            slotsAvail = slotsAvail - 1
                             UseContainerItem(bag, slot)
+                            if GetTradePlayerItemLink(slotIndex) then
+                                item.trading = true
+                                slotIndex = slotIndex + 1
+                            end
                         end
                     end
                 end
@@ -221,20 +224,29 @@ function SK:TRADE_CLOSED()
     C_Timer.After(2, function()
         if not SK.tradeCanceled[tradingPlayer] then
             for _,itemId in pairs(tradingItems) do
-                for _,item in pairs(SK.items) do
-                    if item.itemId == itemId and item.assignedName == tradingPlayer then
-                        item.pickedUp = true
-                        SK:Print(item.link .. " traded to " .. RAID_CLASS_COLORS[item.assignedClass]:WrapTextInColorCode(tradingPlayer))
-                        break
-                    end
-                end
+                table.insert(SK.itemHistory, { itemId = itemId, player = tradingPlayer, time = date("%Y-%m-%d %H:%M:%S") })
+                SK:Print(select(2,GetItemInfo(itemId)) .. " traded to " .. tradingPlayer)
             end
-            SK:ItemList_Update()
         end
     end)
 end
 
---[[ UI Actions ]]--
+function SK:BAG_UPDATE_DELAYED()
+    SK:ItemList_Reload()
+    SK:ItemList_Update(true)
+end
+
+--[[ UI Actions / Events ]]--
+
+function SK:MainFrame_Show()
+    SK:ItemList_Reload()
+    SK:ItemList_Update(true)
+    SK:RegisterEvent("BAG_UPDATE_DELAYED")
+end
+
+function SK:MainFrame_Hide()
+    SK:UnregisterEvent("BAG_UPDATE_DELAYED")
+end
 
 function SK:SortColumn_Click(sortBy)
     if SK.sortBy == sortBy then
@@ -244,10 +256,6 @@ function SK:SortColumn_Click(sortBy)
         SK.sortBy = sortBy
     end
     SK:ItemList_Update(true)
-end
-
-function SK:AddMember_Click()
-    SK.addUserFrame:Show()
 end
 
 function SK:Item_Click(self)
@@ -288,7 +296,6 @@ function SK:AssignItem_Click(self)
     local pickedPlayer = function(self, name, class)
         SK.selectedItem.assignedName = name
         SK.selectedItem.assignedClass = class
-        SK.selectedItem.pickedUp = nil
         CloseDropDownMenus()
         SK:ItemList_Update()
     end
@@ -325,10 +332,6 @@ function SK:AnnounceAll_Click(self)
         return SK:Print("You are not in a raid")
     end
 
-    if not SK.selectedItem then
-        return SK:Print("No item selected")
-    end
-
     StaticPopupDialogs["LOOTTRADER_ANNOUNCE_CONFIRM"] = {
         text = "Announce " .. #SK.items .. " item(s) to raid chat?",
         button1 = "Yes",
@@ -348,22 +351,10 @@ function SK:AnnounceAll_Click(self)
     StaticPopup_Show("LOOTTRADER_ANNOUNCE_CONFIRM")
 end
 
-function SK:Reload_Click(self)
-    StaticPopupDialogs["LOOTTRADER_RELOAD_CONFIRM"] = {
-        text = "Reload items?",
-        button1 = "Yes",
-        button2 = "No",
-        OnAccept = function()
-            SK:ItemList_Reload()
-            SK:ItemList_Update(true)
-        end,
-        timeout = 0,
-        whileDead = true,
-        hideOnEscape = true,
-        preferredIndex = 3,
-    }
-
-    StaticPopup_Show("LOOTTRADER_RELOAD_CONFIRM")
+function SK:History_Click(self)
+    for _,h in pairs(SK.itemHistory) do
+        SK:Print(select(2, GetItemInfo(h.itemId)) .. " - " .. h.player .. " - " .. h.time)
+    end
 end
 
 --[[ Helper Functions ]]--
@@ -394,4 +385,8 @@ end
 
 function SK:Print(message)
     DEFAULT_CHAT_FRAME:AddMessage("|cff33ff99LootTrader|r: "..message)
+end
+
+function SK:invKey(item)
+    return tostring(item.bag).."_"..tostring(item.slot)
 end
