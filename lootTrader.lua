@@ -93,17 +93,17 @@ end
 
 function SK:SortItems()
     if SK.sortBy == "item" and SK.sortReverse then
-        table.sort(SK.items, function(i1,i2) return format("%s%02u%02u", i1.itemName, i1.slot, i1.bag) > format("%s%02u%02u", i2.itemName, i2.slot, i2.bag); end)
+        table.sort(SK.items, function(i1,i2) return format("%s%s", i1.itemName, SK:invKey(i1)) > format("%s%s", i2.itemName, SK:invKey(i2)); end)
     elseif SK.sortBy == "item" and not SK.sortReverse then
-        table.sort(SK.items, function(i1,i2) return format("%s%02u%02u", i1.itemName, i1.slot, i1.bag) < format("%s%02u%02u", i2.itemName, i2.slot, i2.bag); end)
+        table.sort(SK.items, function(i1,i2) return format("%s%s", i1.itemName, SK:invKey(i1)) < format("%s%s", i2.itemName, SK:invKey(i2)); end)
     elseif SK.sortBy == "player" and SK.sortReverse then
-        table.sort(SK.items, function(i1,i2) return format("%s%02u%02u", i1.assignedName or "", i1.slot, i1.bag) > format("%s%02u%02u", i2.assignedName or "", i2.slot, i2.bag); end)
+        table.sort(SK.items, function(i1,i2) return format("%s%s", i1.assignedName or "", SK:invKey(i1)) > format("%s%s", i2.assignedName or "", SK:invKey(i2)); end)
     elseif SK.sortBy == "player" and not SK.sortReverse then
-        table.sort(SK.items, function(i1,i2) return format("%s%02u%02u", i1.assignedName or "", i1.slot, i1.bag) < format("%s%02u%02u", i2.assignedName or "", i2.slot, i2.bag); end)
+        table.sort(SK.items, function(i1,i2) return format("%s%s", i1.assignedName or "", SK:invKey(i1)) < format("%s%s", i2.assignedName or "", SK:invKey(i2)); end)
     elseif SK.sortReverse then -- default to time
-        table.sort(SK.items, function(i1,i2) return format("%03u%02u%02u", i1.time, i1.slot, i1.bag) > format("%03u%02u%02u", i2.time, i2.slot, i2.bag); end)
+        table.sort(SK.items, function(i1,i2) return format("%03u%s", i1.time, SK:invKey(i1)) > format("%03u%s", i2.time, SK:invKey(i2)); end)
     else -- default to time
-        table.sort(SK.items, function(i1,i2) return format("%03u%02u%02u", i1.time, i1.slot, i1.bag) < format("%03u%02u%02u", i2.time, i2.slot, i2.bag); end)
+        table.sort(SK.items, function(i1,i2) return format("%03u%s", i1.time, SK:invKey(i1)) < format("%03u%s", i2.time, SK:invKey(i2)); end)
     end
 end
 
@@ -116,7 +116,7 @@ function SK:PLAYER_LOGIN()
     SK.items = {}
     SK.itemHistory = {}
     SK.tradeCanceled = {}
-    SK.debug = true
+    SK.debug = false
     LootTraderAddonSavedVariables = LootTraderAddonSavedVariables or {}
 
     SK.mainFrame = CreateFrame("Frame", "LootTraderMainFrame", UIParent, "MainFrameTemplate")
@@ -125,7 +125,7 @@ function SK:PLAYER_LOGIN()
     SK.scanTooltip = CreateFrame("GameTooltip")
     SK.scanTooltip:SetOwner(UIParent, "ANCHOR_NONE")
     SK.scanTooltip.left, SK.scanTooltip.right = {}, {}
-    for i=1,30 do
+    for i=1,60 do
         SK.scanTooltip.left[i], SK.scanTooltip.right[i] = SK.scanTooltip:CreateFontString(), SK.scanTooltip:CreateFontString()
         SK.scanTooltip.left[i]:SetFontObject(GameFontNormal)
         SK.scanTooltip.right[i]:SetFontObject(GameFontNormal)
@@ -172,26 +172,13 @@ function SK:TRADE_SHOW()
 
     local slotIndex = 1
 
-    -- clear trading flag
-    for _,item in pairs(SK.items) do item.trading = false;	end
-
-    for bag = 0, NUM_BAG_SLOTS do
-        if GetContainerNumSlots(bag) then
-            for slot = 1, GetContainerNumSlots(bag) do
-                local _, _, _, _, _, _, link, _, _, itemId = GetContainerItemInfo(bag, slot)
-
-                for _,item in pairs(SK.items) do
-                    if item.itemId == itemId and item.trading == false and item.assignedName == SK.tradingPlayer and slotIndex < 7 then
-                        SK:ScanToolTipSetBagItem(bag, slot)
-                        if SK:ScanToolTipFindLine("You may trade this item with players that were also eligible", true, false) then
-                            UseContainerItem(bag, slot)
-                            if GetTradePlayerItemLink(slotIndex) then
-                                item.trading = true
-                                slotIndex = slotIndex + 1
-                            end
-                        end
-                    end
-                end
+    for _,item in pairs(SK.items) do
+        if item.assignedName == SK.tradingPlayer and slotIndex < 7 then
+            UseContainerItem(item.bag, item.slot)
+            if GetTradePlayerItemLink(slotIndex) then
+                slotIndex = slotIndex + 1
+            else
+                SK:Print("Problem trading item: "..item.link)
             end
         end
     end
@@ -204,7 +191,13 @@ function SK:TRADE_ACCEPT_UPDATE()
         local link = GetTradePlayerItemLink(i)
         if link then
             local itemId = GetItemInfoInstant(link)
-            table.insert(SK.tradingItems, itemId)
+
+            for _,item in pairs(SK.items) do
+                if item.itemId == itemId and item.assignedName == SK.tradingPlayer then
+                    table.insert(SK.tradingItems, itemId)
+                    break
+                end
+            end
         end
     end
 end
@@ -371,12 +364,12 @@ function SK:ScanToolTipFindLine(needle, left, right)
     end
 
     for i = 1,SK.scanTooltip:NumLines() do
-        if left then
+        if left and SK.scanTooltip.left[i] then
             str = SK.scanTooltip.left[i]:GetText() or ""
             if str:match(needle) then return str; end
         end
 
-        if right then
+        if right and SK.scanTooltip.right[i] then
             str = SK.scanTooltip.right[i]:GetText() or ""
             if str:match(needle) then return str; end
         end
@@ -388,5 +381,5 @@ function SK:Print(message)
 end
 
 function SK:invKey(item)
-    return tostring(item.bag).."_"..tostring(item.slot)
+    return format("%02u%02u", item.bag, item.slot);
 end
