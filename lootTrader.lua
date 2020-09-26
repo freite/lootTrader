@@ -118,6 +118,7 @@ function SK:PLAYER_LOGIN()
     SK.tradeCanceled = {}
     SK.debug = false
     LootTraderAddonSavedVariables = LootTraderAddonSavedVariables or {}
+    SK.accountSettings = LootTraderAddonSavedVariables
 
     SK.mainFrame = CreateFrame("Frame", "LootTraderMainFrame", UIParent, "MainFrameTemplate")
     SK.dropMenuFrame = CreateFrame("Frame", "LootTraderDropMenuHelper", UIParent, "UIDropDownMenuTemplate")
@@ -147,7 +148,7 @@ function SK:PLAYER_LOGIN()
         end
     })
 
-    LibDBIcon:Register("LootTrader", miniButton, LootTraderAddonSavedVariables);
+    LibDBIcon:Register("LootTrader", miniButton, SK.accountSettings);
 
     SK:RegisterEvent("TRADE_SHOW")
     SK:RegisterEvent("TRADE_ACCEPT_UPDATE")
@@ -251,73 +252,33 @@ function SK:SortColumn_Click(sortBy)
     SK:ItemList_Update(true)
 end
 
-function SK:Item_Click(self)
-    SK.selectedItem = self.item
+function SK:Item_Click(self, button)
+    if button == "LeftButton" and IsShiftKeyDown() then
+        SK:AnnounceItem(self.item)
+    elseif button == "LeftButton" then
+        SK.selectedItem = self.item
+        SetPortraitToTexture(SK.mainFrame.portrait, SK.selectedItem.icon)
+        SK.mainFrame.ItemLink:SetText(SK.selectedItem.link)
+    elseif button == "RightButton" then
+        SK:AssignItem(self.item)
+    end
     SK:ItemList_Update()
-
-    SetPortraitToTexture(SK.mainFrame.portrait, SK.selectedItem.icon)
-    SK.mainFrame.ItemLink:SetText(SK.selectedItem.link)
 end
 
 function SK:AssignItem_Click(self)
-    local playersByClass = {}
-
-    if not UnitInRaid("player") then
-        return SK:Print("You are not in a raid")
-    end
-
     if not SK.selectedItem then
         return SK:Print("No item selected")
     end
 
-    -- players in raid
-    for i=1,MAX_RAID_MEMBERS do
-        local name = UnitName('raid'..i)
-        local classEnglish, class = UnitClass('raid'..i);
-
-        if name then
-            if not playersByClass[class] then playersByClass[class] = { classEnglish = classEnglish, players = {} }; end
-            table.insert(playersByClass[class].players, name)
-        end
-    end
-
-    -- build menu
-    local menu = {
-        { text = "Assign item to player", isTitle = true, notCheckable = true }
-    }
-
-    local pickedPlayer = function(self, name, class)
-        SK.selectedItem.assignedName = name
-        SK.selectedItem.assignedClass = class
-        CloseDropDownMenus()
-        SK:ItemList_Update()
-    end
-
-    for class,data in pairs(playersByClass) do
-        local subMenu = {}
-        for _,name in pairs(data.players) do
-            table.insert(subMenu, { text = RAID_CLASS_COLORS[class]:WrapTextInColorCode(name), notCheckable = true, arg1 = name, arg2 = class, func = pickedPlayer })
-        end
-
-        table.insert(menu, { text = RAID_CLASS_COLORS[class]:WrapTextInColorCode(data.classEnglish), hasArrow = true, notCheckable = true, keepShownOnClick = true, menuList = subMenu })
-    end
-
-    table.insert(menu, { text = "Cancel", notCheckable = true })
-
-    EasyMenu(menu, SK.dropMenuFrame, "cursor", 5, -5, "MENU");
+    SK:AssignItem(SK.selectedItem)
 end
 
 function SK:AnnounceOne_Click(self)
-    if not UnitInRaid("player") then
-        return SK:Print("You are not in a raid")
-    end
-
     if not SK.selectedItem then
         return SK:Print("No item selected")
     end
 
-    local channel = (UnitIsGroupAssistant("player") or UnitIsGroupLeader("player")) and "RAID_WARNING" or "RAID"
-    SendChatMessage("Now bidding on " .. SK.selectedItem.link, channel);
+    SK:AnnounceItem(SK.selectedItem)
 end
 
 function SK:AnnounceAll_Click(self)
@@ -345,12 +306,89 @@ function SK:AnnounceAll_Click(self)
 end
 
 function SK:History_Click(self)
-    for _,h in pairs(SK.itemHistory) do
-        SK:Print(select(2, GetItemInfo(h.itemId)) .. " - " .. h.player .. " - " .. h.time)
-    end
+    -- build menu
+    local menu = {
+        { text = "Settings", isTitle = true, notCheckable = true },
+        { text = "Whisper winner", keepShownOnClick = true, checked = SK.accountSettings.whisperAssignee, func = function()
+            SK.accountSettings.whisperAssignee = not SK.accountSettings.whisperAssignee
+        end },
+        { text = "Announce winner in raid", keepShownOnClick = true, checked = SK.accountSettings.announceAssignee, func = function()
+            SK.accountSettings.announceAssignee = not SK.accountSettings.announceAssignee
+        end },
+        { text = "Actions", isTitle = true, notCheckable = true },
+        { text = "List item history", notCheckable = true, func = function()
+            for _,h in pairs(SK.itemHistory) do
+                SK:Print(select(2, GetItemInfo(h.itemId)) .. " - " .. h.player .. " - " .. h.time)
+            end
+        end },
+        { text = "Cancel", notCheckable = true }
+    }
+
+    EasyMenu(menu, SK.dropMenuFrame, "cursor", 2, -2, "MENU");
 end
 
 --[[ Helper Functions ]]--
+
+function SK:AssignItem(item)
+    if not UnitInRaid("player") then
+        return SK:Print("You are not in a raid")
+    end
+
+    local playersByClass = {}
+
+    -- players in raid
+    for i=1,MAX_RAID_MEMBERS do
+        local name = UnitName('raid'..i)
+        local classEnglish, class = UnitClass('raid'..i);
+
+        if name then
+            if not playersByClass[class] then playersByClass[class] = { classEnglish = classEnglish, players = {} }; end
+            table.insert(playersByClass[class].players, name)
+        end
+    end
+
+    -- build menu
+    local menu = {
+        { text = "Assign "..item.link.." to", isTitle = true, notCheckable = true }
+    }
+
+    local pickedPlayer = function(self, name, class)
+        item.assignedName = name
+        item.assignedClass = class
+        CloseDropDownMenus()
+        SK:ItemList_Update()
+
+        if SK.accountSettings.whisperAssignee then
+            SendChatMessage("You won "..item.link..", trade me", "WHISPER", nil, item.assignedName)
+        end
+
+        if SK.accountSettings.announceAssignee then
+            SendChatMessage(name.." won "..item.link..", trade me", "RAID")
+        end
+    end
+
+    for class,data in pairs(playersByClass) do
+        local subMenu = {}
+        for _,name in pairs(data.players) do
+            table.insert(subMenu, { text = RAID_CLASS_COLORS[class]:WrapTextInColorCode(name), notCheckable = true, arg1 = name, arg2 = class, func = pickedPlayer })
+        end
+
+        table.insert(menu, { text = RAID_CLASS_COLORS[class]:WrapTextInColorCode(data.classEnglish), hasArrow = true, notCheckable = true, keepShownOnClick = true, menuList = subMenu })
+    end
+
+    table.insert(menu, { text = "Cancel", notCheckable = true })
+
+    EasyMenu(menu, SK.dropMenuFrame, "cursor", 2, -2, "MENU");
+end
+
+function SK:AnnounceItem(item)
+    if not UnitInRaid("player") then
+        return SK:Print("You are not in a raid")
+    end
+
+    local channel = (UnitIsGroupAssistant("player") or UnitIsGroupLeader("player")) and "RAID_WARNING" or "RAID"
+    SendChatMessage(item.link, channel);
+end
 
 function SK:ScanToolTipSetBagItem(bag, slot)
     SK.scanTooltip:SetBagItem(bag, slot)

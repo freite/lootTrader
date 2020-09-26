@@ -92,7 +92,8 @@
             </Layer>
         </Layers>
         <Scripts>
-            <OnClick>LootTraderAddon:Item_Click(self)</OnClick>
+            <OnLoad>self:RegisterForClicks("LeftButtonDown", "RightButtonDown")</OnLoad>
+            <OnClick>LootTraderAddon:Item_Click(self, button)</OnClick>
             <OnEnter>
                 GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT", 30, 16)
                 GameTooltip:SetHyperlink(self.item.link)
