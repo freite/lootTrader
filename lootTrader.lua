@@ -66,7 +66,7 @@ function SK:ItemList_Reload()
 
                         local item = { itemId = itemId, link = link, icon = icon, time = time, itemName = itemName, bag = bag, slot = slot }
 
-                        if assignedItems[SK:invKey(item)] then
+                        if assignedItems[SK:invKey(item)] and assignedItems[SK:invKey(item)].itemId == itemId then
                             item.assignedName = assignedItems[SK:invKey(item)].assignedName
                             item.assignedClass = assignedItems[SK:invKey(item)].assignedClass
                         end
@@ -154,6 +154,7 @@ function SK:PLAYER_LOGIN()
     SK:RegisterEvent("TRADE_ACCEPT_UPDATE")
     SK:RegisterEvent("TRADE_REQUEST_CANCEL")
     SK:RegisterEvent("TRADE_CLOSED")
+    SK:RegisterEvent("BAG_UPDATE_DELAYED")
 
     SLASH_LOOTTRADER1 = "/lt";
     SlashCmdList["LOOTTRADER"] = function(arg)
@@ -235,11 +236,9 @@ end
 function SK:MainFrame_Show()
     SK:ItemList_Reload()
     SK:ItemList_Update(true)
-    SK:RegisterEvent("BAG_UPDATE_DELAYED")
 end
 
 function SK:MainFrame_Hide()
-    SK:UnregisterEvent("BAG_UPDATE_DELAYED")
 end
 
 function SK:SortColumn_Click(sortBy)
@@ -315,14 +314,50 @@ function SK:History_Click(self)
         { text = "Announce winner in raid", keepShownOnClick = true, checked = SK.accountSettings.announceAssignee, func = function()
             SK.accountSettings.announceAssignee = not SK.accountSettings.announceAssignee
         end },
+        { text = "Announce disenchant in raid", keepShownOnClick = true, checked = SK.accountSettings.announceDisenchant, func = function()
+            SK.accountSettings.announceDisenchant = not SK.accountSettings.announceDisenchant
+        end },
         { text = "Actions", isTitle = true, notCheckable = true },
         { text = "List item history", notCheckable = true, func = function()
             for _,h in pairs(SK.itemHistory) do
                 SK:Print(select(2, GetItemInfo(h.itemId)) .. " - " .. h.player .. " - " .. h.time)
             end
-        end },
-        { text = "Cancel", notCheckable = true }
+        end }
     }
+
+    local playersByClass = {}
+
+    -- players in raid
+    for i=1,MAX_RAID_MEMBERS do
+        local name = UnitName('raid'..i)
+        local classEnglish, class = UnitClass('raid'..i);
+
+        if name then
+            if not playersByClass[class] then playersByClass[class] = { classEnglish = classEnglish, players = {} }; end
+            table.insert(playersByClass[class].players, name)
+        end
+    end
+
+    local pickedPlayer = function(self, arg)
+        SK.disenchanterName = arg.name
+        SK.disenchanterClass = arg.class
+        CloseDropDownMenus()
+    end
+
+    local deMenu = {}
+    for class,data in pairs(playersByClass) do
+        local subMenu = {}
+        for _,name in pairs(data.players) do
+            table.insert(subMenu, { text = RAID_CLASS_COLORS[class]:WrapTextInColorCode(name), notCheckable = true, arg1 = { name = name, class = class }, func = pickedPlayer })
+        end
+
+        table.insert(deMenu, { text = RAID_CLASS_COLORS[class]:WrapTextInColorCode(data.classEnglish), hasArrow = true, notCheckable = true, keepShownOnClick = true, menuList = subMenu })
+    end
+    table.insert(deMenu, { text = "|cFFAAAAAAUnassigned|r", notCheckable = true, arg1 = { name = nil, class = nil }, func = pickedPlayer })
+
+    local disenchanter = SK.disenchanterName and RAID_CLASS_COLORS[SK.disenchanterClass]:WrapTextInColorCode(SK.disenchanterName) or "|cFFAAAAAAUnassigned|r"
+    table.insert(menu, { text = "Disenchanter: "..disenchanter, hasArrow = true, notCheckable = true, keepShownOnClick = true, menuList = deMenu })
+    table.insert(menu, { text = "Cancel", notCheckable = true })
 
     EasyMenu(menu, SK.dropMenuFrame, "cursor", 2, -2, "MENU");
 end
@@ -352,28 +387,36 @@ function SK:AssignItem(item)
         { text = "Assign "..item.link.." to", isTitle = true, notCheckable = true }
     }
 
-    local pickedPlayer = function(self, name, class)
-        item.assignedName = name
-        item.assignedClass = class
+    local pickedPlayer = function(self, arg)
+        item.assignedName = arg.name
+        item.assignedClass = arg.class
         CloseDropDownMenus()
         SK:ItemList_Update()
 
-        if SK.accountSettings.whisperAssignee then
+        if SK.accountSettings.announceDisenchant and arg.disenchant then
+            SendChatMessage("Disenchanting "..item.link, "RAID")
+        end
+
+        if SK.accountSettings.whisperAssignee and not arg.disenchant then
             SendChatMessage("You won "..item.link..", trade me", "WHISPER", nil, item.assignedName)
         end
 
-        if SK.accountSettings.announceAssignee then
-            SendChatMessage(name.." won "..item.link..", trade me", "RAID")
+        if SK.accountSettings.announceAssignee and not arg.disenchant then
+            SendChatMessage(arg.name.." won "..item.link..", trade me", "RAID")
         end
     end
 
     for class,data in pairs(playersByClass) do
         local subMenu = {}
         for _,name in pairs(data.players) do
-            table.insert(subMenu, { text = RAID_CLASS_COLORS[class]:WrapTextInColorCode(name), notCheckable = true, arg1 = name, arg2 = class, func = pickedPlayer })
+            table.insert(subMenu, { text = RAID_CLASS_COLORS[class]:WrapTextInColorCode(name), notCheckable = true, arg1 = { name = name, class = class }, func = pickedPlayer })
         end
 
         table.insert(menu, { text = RAID_CLASS_COLORS[class]:WrapTextInColorCode(data.classEnglish), hasArrow = true, notCheckable = true, keepShownOnClick = true, menuList = subMenu })
+    end
+
+    if SK.disenchanterName then
+        table.insert(menu, { text = "Disenchant: "..RAID_CLASS_COLORS[SK.disenchanterClass]:WrapTextInColorCode(SK.disenchanterName), notCheckable = true, arg1 = { name = SK.disenchanterName, class = SK.disenchanterClass, disenchant = true }, func = pickedPlayer })
     end
 
     table.insert(menu, { text = "Cancel", notCheckable = true })
