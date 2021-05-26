@@ -22,7 +22,11 @@ function SK:ItemList_Update(sort)
             SK.mainFrame.entries[i]:Hide()
         else
             local item = SK.items[start+i]
-            SK.mainFrame.entries[i].Col1:SetText(item.link)
+            if item.invCount > 1 then
+                SK.mainFrame.entries[i].Col1:SetText(item.link .. " x |cFFFF0000"..item.invCount.."|r")
+            else
+                SK.mainFrame.entries[i].Col1:SetText(item.link)
+            end
             if item.assignedName then
                 SK.mainFrame.entries[i].Col2:SetText(RAID_CLASS_COLORS[item.assignedClass]:WrapTextInColorCode(item.assignedName))
             else
@@ -37,7 +41,7 @@ function SK:ItemList_Update(sort)
 end
 
 function SK:ItemList_Reload()
-    local assignedItems, prevSelectedItem = {}, SK.selectedItem
+    local assignedItems, prevSelectedItem, itemIdCounter = {}, SK.selectedItem, {}
 
     -- saved assigned items
     for _,item in pairs(SK.items) do
@@ -64,7 +68,7 @@ function SK:ItemList_Reload()
                         local time = string.match(line, ".-(%d+) min") or 0
                         time = time + (string.match(line, ".-(%d+) hour") or 0)*60
 
-                        local item = { itemId = itemId, link = link, icon = icon, time = time, itemName = itemName, bag = bag, slot = slot }
+                        local item = { itemId = itemId, link = link, icon = icon, time = time, itemName = itemName, bag = bag, slot = slot, invCount = 1 }
 
                         if assignedItems[SK:invKey(item)] and assignedItems[SK:invKey(item)].itemId == itemId then
                             item.assignedName = assignedItems[SK:invKey(item)].assignedName
@@ -76,10 +80,16 @@ function SK:ItemList_Reload()
                         end
 
                         table.insert(SK.items, item)
+                        itemIdCounter[itemId] = itemIdCounter[itemId] and itemIdCounter[itemId] + 1 or 1
                     end
                 end
             end
         end
+    end
+
+    -- update invCount counter on items
+    for _,item in pairs(SK.items) do
+        item.invCount = itemIdCounter[item.itemId] or 1
     end
 
     if SK.selectedItem then
@@ -176,12 +186,10 @@ function SK:TRADE_SHOW()
 
     for _,item in pairs(SK.items) do
         if item.assignedName == SK.tradingPlayer and slotIndex < 7 then
-            UseContainerItem(item.bag, item.slot)
-            if GetTradePlayerItemLink(slotIndex) then
-                slotIndex = slotIndex + 1
-            else
-                SK:Print("Problem trading item: "..item.link)
-            end
+            C_Timer.After(slotIndex * 0.2, function()
+                UseContainerItem(item.bag, item.slot)
+            end)
+            slotIndex = slotIndex + 1
         end
     end
 end
@@ -430,7 +438,7 @@ function SK:AnnounceItem(item)
     end
 
     local channel = (UnitIsGroupAssistant("player") or UnitIsGroupLeader("player")) and "RAID_WARNING" or "RAID"
-    SendChatMessage(item.link, channel);
+    SendChatMessage(item.link.."x"..item.invCount.." GO!", channel);
 end
 
 function SK:ScanToolTipSetBagItem(bag, slot)
